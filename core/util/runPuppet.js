@@ -1,5 +1,7 @@
 const puppeteer = require('puppeteer');
 
+const chromium = require('chrome-aws-lambda');
+
 const fs = require('./fs');
 const path = require('path');
 const chalk = require('chalk');
@@ -67,16 +69,21 @@ async function processScenarioView (scenario, variantOrScenarioLabelSafe, scenar
   const VP_W = viewport.width || viewport.viewport.width;
   const VP_H = viewport.height || viewport.viewport.height;
 
-  const puppeteerArgs = Object.assign(
-    {},
-    {
-      ignoreHTTPSErrors: true,
-      headless: !config.debugWindow
-    },
-    config.engineOptions
-  );
+  // const puppeteerArgs = Object.assign(
+  //   {},
+  //   {
+  //     ignoreHTTPSErrors: true,
+  //     headless: !config.debugWindow
+  //   },
+  //   config.engineOptions
+  // );
 
-  const browser = await puppeteer.launch(puppeteerArgs);
+  const browser = await chromium.puppeteer.launch({
+    args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: chromium.headless
+  });
   const page = await browser.newPage();
 
   await page.setViewport({ width: VP_W, height: VP_H });
